@@ -136,10 +136,12 @@ export function QuestionnairePage() {
   }
 
   return (
-    <div className="page wide">
+    <div className="shell">
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
+      <div className="page wide">
+        <div className="card">
       <header className="app-header">
         <div>
           <p className="eyebrow">CyberShield</p>
@@ -224,6 +226,8 @@ export function QuestionnairePage() {
           </form>
         )}
       </main>
+        </div>
+      </div>
     </div>
   );
 }

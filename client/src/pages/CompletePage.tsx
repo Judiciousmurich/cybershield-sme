@@ -50,10 +50,12 @@ export function CompletePage() {
   const status = assessment?.status ?? 'completed';
 
   return (
-    <div className="page wide">
+    <div className="shell">
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
+      <div className="page wide">
+        <div className="card">
       <header>
         <p className="eyebrow">CyberShield</p>
         <h1>Assessment complete</h1>
@@ -220,6 +222,8 @@ export function CompletePage() {
           <Link to="/questionnaire">Start another assessment</Link>
         </p>
       </main>
+        </div>
+      </div>
     </div>
   );
 }
