@@ -72,6 +72,17 @@ npm run dev
 
 The Vite dev server proxies `/api` and `/health` to `http://localhost:4000`.
 
+## Questionnaire and Cypress
+
+After the database is migrated and seeded, register or log in at [http://localhost:5173](http://localhost:5173). The questionnaire walks through one domain at a time and saves each answer immediately.
+
+End-to-end test (client, server, and seed data must already be running):
+
+```bash
+cd client
+npm run test:e2e
+```
+
 ## Environment variables
 
 | Variable | Purpose |
@@ -90,8 +101,8 @@ This repo is built in phases:
 
 0. Monorepo and Docker environment
 1. Database schema and question seed data
-2. JWT authentication (this commit)
-3. Questionnaire flow
+2. JWT authentication
+3. Questionnaire flow (this commit)
 4. Scoring engine and recommendations
 5. PDF risk report
 6. Security and accessibility hardening

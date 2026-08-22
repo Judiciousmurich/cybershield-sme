@@ -3,7 +3,7 @@
   line-height: 1.5;
   font-weight: 400;
   color: #111827;
-  background-color: #f9fafb;
+  background-color: #f3f4f6;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -28,7 +28,7 @@ h2 {
 
 h1 {
   margin: 0 0 0.75rem;
-  font-size: 2.25rem;
+  font-size: 2rem;
 }
 
 h2 {
@@ -39,6 +39,15 @@ h2 {
 p {
   margin: 0 0 0.75rem;
   color: #374151;
+}
+
+code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.9em;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  background: #e5e7eb;
+  color: #111827;
 }
 
 #root {

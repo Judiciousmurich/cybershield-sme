@@ -27,6 +27,17 @@ npm run seed
 - `GET /api/auth/me` — current user; requires `Authorization: Bearer <token>`
 - Auth routes are rate-limited to slow brute-force attempts
 
+## Questionnaire
+
+Authenticated routes:
+
+- `GET /api/questions` — active questions grouped by domain
+- `POST /api/assessments` — start an `in_progress` assessment
+- `GET /api/assessments/current` — resume the latest open assessment
+- `GET /api/assessments/:id` — one assessment you own, plus responses
+- `POST /api/assessments/:id/responses` — save or update an answer
+- `POST /api/assessments/:id/complete` — mark complete once every question is answered
+
 ```bash
 npm test
 ```

@@ -1,7 +1,9 @@
 import cors from 'cors';
 import express from 'express';
 import { pool } from './db/pool.js';
+import { assessmentsRouter } from './routes/assessments.js';
 import { authRouter } from './routes/auth.js';
+import { questionsRouter } from './routes/questions.js';
 
 export function createApp() {
   const app = express();
@@ -36,6 +38,8 @@ export function createApp() {
   });
 
   app.use('/api/auth', authRouter);
+  app.use('/api/questions', questionsRouter);
+  app.use('/api/assessments', assessmentsRouter);
 
   app.use(
     (
