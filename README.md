@@ -42,7 +42,15 @@ CyberShield is a cybersecurity risk-assessment tool for small and medium enterpr
    - API health check: [http://localhost:4000/health](http://localhost:4000/health)
    - Postgres: `localhost:5432`, database `cybershield`
 
-The database uses a named Docker volume (`postgres_data`) so data survives container restarts.
+The database uses a named Docker volume (`postgres_data`) so data survives container restarts. The API applies SQL migrations on startup.
+
+Load the sample questionnaire (20 questions across five domains):
+
+```bash
+docker compose exec server npm run seed
+```
+
+Or from `/server` against a local Postgres: `npm run migrate && npm run seed`.
 
 Stop the stack with `Ctrl+C`, or run `docker compose down`. Add `-v` only if you also want to delete the database volume.
 
@@ -80,8 +88,8 @@ Never commit a real `.env` file. `.env.example` is the checked-in template only.
 
 This repo is built in phases:
 
-0. Monorepo and Docker environment (this commit)
-1. Database schema and question seed data
+0. Monorepo and Docker environment
+1. Database schema and question seed data (this commit)
 2. JWT authentication
 3. Questionnaire flow
 4. Scoring engine and recommendations
