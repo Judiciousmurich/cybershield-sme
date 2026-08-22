@@ -11,6 +11,8 @@ describe('Questionnaire flow', () => {
 
     cy.location('pathname').should('eq', '/questionnaire');
     cy.contains('h1', 'Risk questionnaire').should('be.visible');
+    cy.injectAxe();
+    cy.checkA11y(undefined, { includedImpacts: ['critical', 'serious'] });
 
     cy.get('[data-domain-panel]').should('be.visible');
 
@@ -30,6 +32,8 @@ describe('Questionnaire flow', () => {
     cy.location('pathname').should('eq', '/complete');
     cy.contains('h1', 'Assessment complete').should('be.visible');
     cy.get('[data-cy="assessment-status"]').should('contain', 'completed');
+    cy.injectAxe();
+    cy.checkA11y(undefined, { includedImpacts: ['critical', 'serious'] });
 
     cy.window().then((win) => {
       const token = win.sessionStorage.getItem('cybershield.token');

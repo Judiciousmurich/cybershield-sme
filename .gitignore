@@ -8,3 +8,4 @@ coverage
 cypress/videos
 cypress/screenshots
 server/storage/reports/*.pdf
+server/storage/reports/*.enc

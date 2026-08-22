@@ -37,15 +37,16 @@ export async function findUserById(id: string): Promise<UserRecord | null> {
 export async function createUser(
   email: string,
   passwordHash: string,
+  role: 'user' | 'admin' = 'user',
 ): Promise<UserRecord> {
   try {
     const result = await pool.query<UserRecord>(
       `
-        INSERT INTO users (email, password_hash)
-        VALUES ($1, $2)
+        INSERT INTO users (email, password_hash, role)
+        VALUES ($1, $2, $3)
         RETURNING id, email, password_hash, role, created_at, business_context
       `,
-      [email, passwordHash],
+      [email, passwordHash, role],
     );
     return result.rows[0];
   } catch (error) {

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ApiError, api } from '../api';
 import { useAuth } from '../auth/AuthContext';
@@ -8,6 +8,7 @@ import type {
   DomainGroup,
   SavedResponse,
 } from '../types';
+import { useDocumentTitle } from '../useDocumentTitle';
 
 export function QuestionnairePage() {
   const { token, user, logout } = useAuth();
@@ -20,6 +21,18 @@ export function QuestionnairePage() {
   const [pendingSaves, setPendingSaves] = useState(0);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
+  const domainHeadingRef = useRef<HTMLParagraphElement>(null);
+  const skipInitialFocus = useRef(true);
+
+  useDocumentTitle('Risk questionnaire — CyberShield');
+
+  useEffect(() => {
+    if (skipInitialFocus.current) {
+      skipInitialFocus.current = false;
+      return;
+    }
+    domainHeadingRef.current?.focus();
+  }, [domainIndex]);
 
   useEffect(() => {
     if (!token) {
@@ -155,7 +168,12 @@ export function QuestionnairePage() {
             data-domain-panel={currentDomain.id}
             onSubmit={(event) => event.preventDefault()}
           >
-            <p className="progress" aria-live="polite">
+            <p
+              className="progress"
+              aria-live="polite"
+              tabIndex={-1}
+              ref={domainHeadingRef}
+            >
               Domain {domainIndex + 1} of {domains.length}: {currentDomain.label}
             </p>
 

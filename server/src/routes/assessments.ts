@@ -16,6 +16,7 @@ import { persistReportFile } from '../reports/store.js';
 import { calculateAndStoreResults } from '../scoring/results.js';
 import { toPublicUser } from '../auth/service.js';
 import { isAssessmentId, validateAnswerValue } from '../validation/answers.js';
+import { parseBody, responseBodySchema } from '../validation/http.js';
 
 export const assessmentsRouter = Router();
 
@@ -88,14 +89,12 @@ assessmentsRouter.post('/:id/responses', async (req, res, next) => {
       return;
     }
 
-    const body = req.body as Record<string, unknown>;
-    const questionId =
-      typeof body.question_id === 'string' ? body.question_id : '';
-
-    if (!isAssessmentId(questionId)) {
-      res.status(400).json({ error: 'A valid question_id is required.' });
+    const parsed = parseBody(responseBodySchema, req.body);
+    if (!parsed.ok) {
+      res.status(400).json({ error: parsed.error });
       return;
     }
+    const questionId = parsed.data.question_id;
 
     const question = await findQuestionById(questionId);
     if (!question) {
@@ -103,7 +102,7 @@ assessmentsRouter.post('/:id/responses', async (req, res, next) => {
       return;
     }
 
-    const invalid = validateAnswerValue(question, body.answer_value);
+    const invalid = validateAnswerValue(question, parsed.data.answer_value);
     if (invalid) {
       res.status(400).json({ error: invalid });
       return;
@@ -112,7 +111,7 @@ assessmentsRouter.post('/:id/responses', async (req, res, next) => {
     const response = await upsertResponse(
       assessment.id,
       question.id,
-      String(body.answer_value).trim(),
+      parsed.data.answer_value,
     );
     res.json({ response });
   } catch (error) {

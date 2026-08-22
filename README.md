@@ -99,6 +99,10 @@ npm run test:e2e
 | `JWT_EXPIRY` | Token lifetime, e.g. `1h` |
 | `NODE_ENV` | `development` or `production` |
 | `PORT` | Express listen port (default `4000`) |
+| `REPORT_ENCRYPTION_KEY` | 64 hex chars; AES-256-GCM key for stored PDFs |
+| `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional; seed creates an admin who can manage questions |
+
+See [SECURITY.md](SECURITY.md) for what is implemented vs known gaps.
 
 Never commit a real `.env` file. `.env.example` is the checked-in template only.
 
@@ -111,5 +115,5 @@ This repo is built in phases:
 2. JWT authentication
 3. Questionnaire flow
 4. Scoring engine and recommendations
-5. PDF risk report (this commit)
-6. Security and accessibility hardening
+5. PDF risk report
+6. Security and accessibility hardening (this commit)

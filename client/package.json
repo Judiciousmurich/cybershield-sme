@@ -20,6 +20,8 @@
     "@testing-library/cypress": "^10.0.3",
     "@types/node": "^22.13.5",
     "cypress": "^14.2.0",
+    "cypress-axe": "^1.6.0",
+    "axe-core": "^4.10.3",
     "@types/react": "^18.3.18",
     "@types/react-dom": "^18.3.5",
     "@vitejs/plugin-react": "^4.3.4",

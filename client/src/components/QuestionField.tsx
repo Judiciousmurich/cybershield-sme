@@ -17,7 +17,7 @@ export function QuestionField({
   return (
     <fieldset className="question" data-question-id={question.id}>
       <legend>{question.text}</legend>
-      <div className="options" role="radiogroup" aria-label={question.text}>
+      <div className="options">
         {options.map((option) => {
           const inputId = `${question.id}-${option.value}`;
           return (

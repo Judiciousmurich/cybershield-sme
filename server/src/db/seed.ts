@@ -1,4 +1,6 @@
+import bcrypt from 'bcryptjs';
 import { pool } from './pool.js';
+import { createUser, findUserByEmail } from './users.js';
 
 type QuestionSeed = {
   id: string;
@@ -215,10 +217,28 @@ export async function seedQuestions(): Promise<number> {
   return upserted;
 }
 
+export async function seedAdminUser(): Promise<void> {
+  const email = process.env.ADMIN_EMAIL?.trim().toLowerCase();
+  const password = process.env.ADMIN_PASSWORD;
+  if (!email || !password) {
+    return;
+  }
+
+  const existing = await findUserByEmail(email);
+  if (existing) {
+    return;
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  await createUser(email, passwordHash, 'admin');
+  console.log(`Seeded admin user ${email}`);
+}
+
 async function runCli(): Promise<void> {
   try {
     const count = await seedQuestions();
     console.log(`Seeded ${count} questions across five domains.`);
+    await seedAdminUser();
   } finally {
     await pool.end();
   }

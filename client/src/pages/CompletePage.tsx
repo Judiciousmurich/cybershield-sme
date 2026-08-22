@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { ApiError, api, downloadPdf } from '../api';
 import { useAuth } from '../auth/AuthContext';
 import type { Assessment, AssessmentResults } from '../types';
+import { useDocumentTitle } from '../useDocumentTitle';
 
 type LocationState = {
   assessment?: Assessment;
@@ -10,6 +11,7 @@ type LocationState = {
 
 export function CompletePage() {
   const { token, user, updateBusinessContext } = useAuth();
+  useDocumentTitle('Assessment results — CyberShield');
   const location = useLocation();
   const fromState = (location.state as LocationState | null)?.assessment;
   const assessmentId =
@@ -151,6 +153,7 @@ export function CompletePage() {
                   name="business_context"
                   rows={3}
                   maxLength={500}
+                  autoComplete="organization"
                   value={context}
                   aria-describedby="context-help"
                   onChange={(event) => setContext(event.target.value)}

@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react';
 import { Navigate } from 'react-router-dom';
 import { ApiError } from '../api';
 import { useAuth } from '../auth/AuthContext';
+import { useDocumentTitle } from '../useDocumentTitle';
 
 export function AuthPage() {
   const { token, login, register } = useAuth();
@@ -10,6 +11,10 @@ export function AuthPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  useDocumentTitle(
+    mode === 'login' ? 'Log in — CyberShield' : 'Register — CyberShield',
+  );
 
   if (token) {
     return <Navigate to="/questionnaire" replace />;
@@ -69,7 +74,7 @@ export function AuthPage() {
         <form onSubmit={handleSubmit} noValidate>
           <h2>{mode === 'login' ? 'Log in' : 'Create an account'}</h2>
           {error && (
-            <p className="error" role="alert">
+            <p className="error" role="alert" id="form-error">
               {error}
             </p>
           )}
@@ -83,6 +88,8 @@ export function AuthPage() {
               value={email}
               onChange={(event) => setEmail(event.target.value)}
               required
+              aria-invalid={Boolean(error)}
+              aria-describedby={error ? 'form-error' : undefined}
             />
           </div>
           <div className="field">
@@ -98,7 +105,10 @@ export function AuthPage() {
               onChange={(event) => setPassword(event.target.value)}
               required
               minLength={8}
-              aria-describedby="password-help"
+              aria-invalid={Boolean(error)}
+              aria-describedby={
+                error ? 'form-error password-help' : 'password-help'
+              }
             />
             <p id="password-help" className="hint">
               At least 8 characters, including one letter and one number.

@@ -45,6 +45,16 @@ Authenticated routes:
 npm run test:api
 ```
 
+Admin (JWT + `role=admin` only):
+
+- `GET /api/admin/questions` — all questions, including inactive
+- `POST /api/admin/questions` — create
+- `PUT /api/admin/questions/:id` — update text, weight, options, or `active`
+
+Seed an admin when `ADMIN_EMAIL` and `ADMIN_PASSWORD` are set.
+
+See `/SECURITY.md` for headers, AES-256 at rest, and known gaps.
+
 Newman collection: `/postman/CyberShield-report.postman_collection.json`.
 
 Scoring is a weighted percentage per NIST CSF-aligned domain. Thresholds: High risk below 40%, Medium from 40 up to 70%, Low at 70% and above. See the comment block in `src/scoring/engine.ts`.

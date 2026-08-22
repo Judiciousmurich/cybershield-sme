@@ -85,7 +85,7 @@ textarea {
 
 .hint {
   margin: 0.4rem 0 0;
-  color: #374151;
+  color: #1f2937;
   font-size: 0.95rem;
 }
 
@@ -163,7 +163,9 @@ button[aria-pressed='true'] {
 }
 
 button:disabled {
-  opacity: 0.55;
+  background: #e5e7eb;
+  border-color: #4b5563;
+  color: #1f2937;
   cursor: not-allowed;
 }
 

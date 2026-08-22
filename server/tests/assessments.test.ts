@@ -17,8 +17,11 @@ jest.mock('../src/db/assessments.js', () => ({
 
 jest.mock('../src/db/questions.js', () => ({
   listActiveQuestions: jest.fn(),
+  listAllQuestions: jest.fn(),
   findQuestionById: jest.fn(),
   countActiveQuestions: jest.fn(),
+  createQuestion: jest.fn(),
+  updateQuestion: jest.fn(),
 }));
 
 jest.mock('../src/db/pool.js', () => ({
