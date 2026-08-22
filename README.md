@@ -102,7 +102,7 @@ This repo is built in phases:
 0. Monorepo and Docker environment
 1. Database schema and question seed data
 2. JWT authentication
-3. Questionnaire flow (this commit)
-4. Scoring engine and recommendations
+3. Questionnaire flow
+4. Scoring engine and recommendations (this commit)
 5. PDF risk report
 6. Security and accessibility hardening

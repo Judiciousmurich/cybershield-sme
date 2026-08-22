@@ -48,3 +48,28 @@ export type SavedResponse = {
   answer_value: string;
   answered_at: string;
 };
+
+export type RiskBand = 'Low' | 'Medium' | 'High';
+
+export type AssessmentResults = {
+  assessment_id: string;
+  overall: {
+    score: number;
+    risk_band: RiskBand;
+    rationale: string;
+  };
+  domains: {
+    domain: QuestionDomain;
+    label: string;
+    score: number;
+    earned: number;
+    max_score: number;
+    risk_band: RiskBand;
+  }[];
+  recommendations: {
+    domain: QuestionDomain;
+    priority: number;
+    title: string;
+    detail: string;
+  }[];
+};

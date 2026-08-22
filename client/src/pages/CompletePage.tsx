@@ -1,17 +1,51 @@
+import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import type { Assessment } from '../types';
+import { ApiError, api } from '../api';
+import { useAuth } from '../auth/AuthContext';
+import type { Assessment, AssessmentResults } from '../types';
 
 type LocationState = {
   assessment?: Assessment;
 };
 
 export function CompletePage() {
+  const { token } = useAuth();
   const location = useLocation();
-  const assessment = (location.state as LocationState | null)?.assessment;
+  const fromState = (location.state as LocationState | null)?.assessment;
+  const assessmentId =
+    fromState?.id ?? sessionStorage.getItem('cybershield.assessmentId');
+
+  const [assessment, setAssessment] = useState<Assessment | null>(
+    fromState ?? null,
+  );
+  const [results, setResults] = useState<AssessmentResults | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!token || !assessmentId) {
+      setError('No completed assessment was found for this session.');
+      return;
+    }
+
+    api<{ assessment: Assessment; results: AssessmentResults }>(
+      `/api/assessments/${assessmentId}/results`,
+      { token },
+    )
+      .then((payload) => {
+        setAssessment(payload.assessment);
+        setResults(payload.results);
+      })
+      .catch((err: unknown) => {
+        setError(
+          err instanceof ApiError ? err.message : 'Could not load results.',
+        );
+      });
+  }, [assessmentId, token]);
+
   const status = assessment?.status ?? 'completed';
 
   return (
-    <div className="page">
+    <div className="page wide">
       <a className="skip-link" href="#main">
         Skip to main content
       </a>
@@ -28,12 +62,83 @@ export function CompletePage() {
             Assessment ID: <code>{assessment.id}</code>
           </p>
         )}
+        {error && (
+          <p className="error" role="alert">
+            {error}
+          </p>
+        )}
+
+        {results && (
+          <>
+            <section aria-labelledby="overall-heading">
+              <h2 id="overall-heading">Overall score</h2>
+              <p className="score-hero">
+                <span className="score-value">{results.overall.score}%</span>
+                <span className={`band band-${results.overall.risk_band.toLowerCase()}`}>
+                  {results.overall.risk_band} risk
+                </span>
+              </p>
+              <p>{results.overall.rationale}</p>
+            </section>
+
+            <section aria-labelledby="domain-heading">
+              <h2 id="domain-heading">Scores by domain</h2>
+              <table className="scores">
+                <caption>Weighted domain scores as a percentage of the maximum</caption>
+                <thead>
+                  <tr>
+                    <th scope="col">Domain</th>
+                    <th scope="col">Score</th>
+                    <th scope="col">Risk band</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {results.domains.map((domain) => (
+                    <tr key={domain.domain}>
+                      <th scope="row">{domain.label}</th>
+                      <td>
+                        <meter
+                          min={0}
+                          max={100}
+                          value={domain.score}
+                          aria-label={`${domain.label} ${domain.score} percent`}
+                        >
+                          {domain.score}%
+                        </meter>{' '}
+                        {domain.score}%
+                      </td>
+                      <td>{domain.risk_band}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </section>
+
+            <section aria-labelledby="reco-heading">
+              <h2 id="reco-heading">Prioritised recommendations</h2>
+              {results.recommendations.length === 0 ? (
+                <p>
+                  No domain scored below the Low-risk threshold. Keep reviewing
+                  access and backups as the business changes.
+                </p>
+              ) : (
+                <ol className="recommendations">
+                  {results.recommendations.map((item) => (
+                    <li key={`${item.domain}-${item.priority}`}>
+                      <h3>
+                        {item.priority}. {item.title}
+                      </h3>
+                      <p>{item.detail}</p>
+                    </li>
+                  ))}
+                </ol>
+              )}
+            </section>
+          </>
+        )}
+
         <p>
-          Scoring and a downloadable report arrive in the next phases. You can
-          start another assessment from the questionnaire.
-        </p>
-        <p>
-          <Link to="/questionnaire">Return to questionnaire</Link>
+          <Link to="/questionnaire">Start another assessment</Link>
         </p>
       </main>
     </div>

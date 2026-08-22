@@ -10,6 +10,7 @@ import {
 } from '../db/assessments.js';
 import { countActiveQuestions, findQuestionById } from '../db/questions.js';
 import { requireAuth } from '../middleware/requireAuth.js';
+import { calculateAndStoreResults } from '../scoring/results.js';
 import { isAssessmentId, validateAnswerValue } from '../validation/answers.js';
 
 export const assessmentsRouter = Router();
@@ -146,7 +147,35 @@ assessmentsRouter.post('/:id/complete', async (req, res, next) => {
     }
 
     const completed = await completeAssessment(assessment.id, req.user!.id);
-    res.json({ assessment: completed ?? assessment });
+    const results = await calculateAndStoreResults(assessment.id);
+    res.json({ assessment: completed ?? assessment, results });
+  } catch (error) {
+    next(error);
+  }
+});
+
+assessmentsRouter.get('/:id/results', async (req, res, next) => {
+  try {
+    if (!isAssessmentId(req.params.id)) {
+      res.status(404).json({ error: 'Assessment not found.' });
+      return;
+    }
+
+    const assessment = await getAssessmentForUser(req.params.id, req.user!.id);
+    if (!assessment) {
+      res.status(404).json({ error: 'Assessment not found.' });
+      return;
+    }
+
+    if (assessment.status !== 'completed') {
+      res.status(400).json({
+        error: 'Complete the assessment before viewing results.',
+      });
+      return;
+    }
+
+    const results = await calculateAndStoreResults(assessment.id);
+    res.json({ assessment, results });
   } catch (error) {
     next(error);
   }
