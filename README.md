@@ -9,9 +9,9 @@ CyberShield is a cybersecurity risk-assessment tool for small and medium enterpr
 | Frontend | React 18 (Vite) |
 | Backend | Node.js 20 + Express + TypeScript |
 | Database | PostgreSQL 16 |
-| Auth (later) | JWT + bcrypt |
+| Auth | JWT + bcrypt (bcryptjs) + rate limiting |
 | Containers | Docker Compose for local development |
-| Tests (later) | Jest, Newman, Cypress |
+| Tests | Jest (unit), Newman and Cypress later |
 
 ## Repository layout
 
@@ -89,8 +89,8 @@ Never commit a real `.env` file. `.env.example` is the checked-in template only.
 This repo is built in phases:
 
 0. Monorepo and Docker environment
-1. Database schema and question seed data (this commit)
-2. JWT authentication
+1. Database schema and question seed data
+2. JWT authentication (this commit)
 3. Questionnaire flow
 4. Scoring engine and recommendations
 5. PDF risk report
