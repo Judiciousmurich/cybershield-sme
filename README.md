@@ -102,7 +102,7 @@ npm run test:e2e
 | `REPORT_ENCRYPTION_KEY` | 64 hex chars; AES-256-GCM key for stored PDFs |
 | `ADMIN_EMAIL` / `ADMIN_PASSWORD` | Optional; seed creates an admin who can manage questions |
 
-See [SECURITY.md](SECURITY.md) for what is implemented vs known gaps.
+See [SECURITY.md](SECURITY.md) for what is implemented vs known gaps, and [docs/TEST-LOG.md](docs/TEST-LOG.md) for the Section 5 test appendix.
 
 Never commit a real `.env` file. `.env.example` is the checked-in template only.
 
@@ -116,4 +116,6 @@ This repo is built in phases:
 3. Questionnaire flow
 4. Scoring engine and recommendations
 5. PDF risk report
-6. Security and accessibility hardening (this commit)
+6. Security and accessibility hardening
+
+The implementation brief ends at Phase 6. The Assessment 2 test log (Jest results plus Newman/Cypress placeholders) is in [docs/TEST-LOG.md](docs/TEST-LOG.md).
