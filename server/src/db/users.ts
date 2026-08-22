@@ -13,7 +13,7 @@ export async function findUserByEmail(
 ): Promise<UserRecord | null> {
   const result = await pool.query<UserRecord>(
     `
-      SELECT id, email, password_hash, role, created_at
+      SELECT id, email, password_hash, role, created_at, business_context
       FROM users
       WHERE email = $1
     `,
@@ -25,7 +25,7 @@ export async function findUserByEmail(
 export async function findUserById(id: string): Promise<UserRecord | null> {
   const result = await pool.query<UserRecord>(
     `
-      SELECT id, email, password_hash, role, created_at
+      SELECT id, email, password_hash, role, created_at, business_context
       FROM users
       WHERE id = $1
     `,
@@ -43,7 +43,7 @@ export async function createUser(
       `
         INSERT INTO users (email, password_hash)
         VALUES ($1, $2)
-        RETURNING id, email, password_hash, role, created_at
+        RETURNING id, email, password_hash, role, created_at, business_context
       `,
       [email, passwordHash],
     );
@@ -59,4 +59,20 @@ export async function createUser(
     }
     throw error;
   }
+}
+
+export async function updateBusinessContext(
+  userId: string,
+  businessContext: string | null,
+): Promise<UserRecord | null> {
+  const result = await pool.query<UserRecord>(
+    `
+      UPDATE users
+      SET business_context = $2
+      WHERE id = $1
+      RETURNING id, email, password_hash, role, created_at, business_context
+    `,
+    [userId, businessContext],
+  );
+  return result.rows[0] ?? null;
 }

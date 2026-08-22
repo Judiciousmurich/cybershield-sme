@@ -39,6 +39,7 @@ const user: UserRecord = {
   password_hash: 'hashed',
   role: 'user',
   created_at: new Date('2026-01-15T10:00:00.000Z'),
+  business_context: null,
 };
 
 const assessment: AssessmentRecord = {

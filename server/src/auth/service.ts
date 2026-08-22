@@ -15,6 +15,7 @@ export function toPublicUser(user: UserRecord): PublicUser {
     email: user.email,
     role: user.role,
     created_at: user.created_at,
+    business_context: user.business_context ?? null,
   };
 }
 

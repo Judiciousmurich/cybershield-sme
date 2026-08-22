@@ -76,6 +76,13 @@ The Vite dev server proxies `/api` and `/health` to `http://localhost:4000`.
 
 After the database is migrated and seeded, register or log in at [http://localhost:5173](http://localhost:5173). The questionnaire walks through one domain at a time and saves each answer immediately.
 
+After a completed assessment, the results page can download a PDF report. Newman checks that the report route requires auth, returns 404 for an unknown assessment, and returns `application/pdf` for a completed one (API + seed must be running):
+
+```bash
+cd server
+npm run test:api
+```
+
 End-to-end test (client, server, and seed data must already be running):
 
 ```bash
@@ -103,6 +110,6 @@ This repo is built in phases:
 1. Database schema and question seed data
 2. JWT authentication
 3. Questionnaire flow
-4. Scoring engine and recommendations (this commit)
-5. PDF risk report
+4. Scoring engine and recommendations
+5. PDF risk report (this commit)
 6. Security and accessibility hardening

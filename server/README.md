@@ -38,6 +38,14 @@ Authenticated routes:
 - `POST /api/assessments/:id/responses` — save or update an answer
 - `POST /api/assessments/:id/complete` — mark complete once every question is answered
 - `GET /api/assessments/:id/results` — per-domain scores, overall score, risk band, recommendations
+- `GET /api/assessments/:id/report` — downloadable PDF (requires a completed assessment you own)
+- `PATCH /api/auth/me` — optional `business_context` printed on the report
+
+```bash
+npm run test:api
+```
+
+Newman collection: `/postman/CyberShield-report.postman_collection.json`.
 
 Scoring is a weighted percentage per NIST CSF-aligned domain. Thresholds: High risk below 40%, Medium from 40 up to 70%, Low at 70% and above. See the comment block in `src/scoring/engine.ts`.
 

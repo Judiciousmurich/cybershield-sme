@@ -39,3 +39,19 @@ export async function api<T>(path: string, options: RequestOptions = {}): Promis
 
   return data;
 }
+
+export async function downloadPdf(
+  path: string,
+  token: string,
+): Promise<Blob> {
+  const response = await fetch(path, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
+  if (!response.ok) {
+    const data = (await response.json().catch(() => ({}))) as { error?: string };
+    throw new ApiError(response.status, data.error ?? 'Download failed.');
+  }
+
+  return response.blob();
+}

@@ -17,6 +17,7 @@ type AuthContextValue = {
   user: PublicUser | null;
   login: (email: string, password: string) => Promise<void>;
   register: (email: string, password: string) => Promise<void>;
+  updateBusinessContext: (businessContext: string) => Promise<void>;
   logout: () => void;
 };
 
@@ -65,6 +66,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [login],
   );
 
+  const updateBusinessContext = useCallback(
+    async (businessContext: string) => {
+      const result = await api<{ user: PublicUser }>('/api/auth/me', {
+        method: 'PATCH',
+        token,
+        body: { business_context: businessContext },
+      });
+      sessionStorage.setItem(USER_KEY, JSON.stringify(result.user));
+      setUser(result.user);
+    },
+    [token],
+  );
+
   const logout = useCallback(() => {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(USER_KEY);
@@ -74,8 +88,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const value = useMemo(
-    () => ({ token, user, login, register, logout }),
-    [token, user, login, register, logout],
+    () => ({ token, user, login, register, updateBusinessContext, logout }),
+    [token, user, login, register, updateBusinessContext, logout],
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

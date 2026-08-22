@@ -6,6 +6,7 @@ export type UserRecord = {
   password_hash: string;
   role: UserRole;
   created_at: Date;
+  business_context: string | null;
 };
 
 export type PublicUser = {
@@ -13,6 +14,7 @@ export type PublicUser = {
   email: string;
   role: UserRole;
   created_at: Date;
+  business_context: string | null;
 };
 
 export type AuthTokenPayload = {

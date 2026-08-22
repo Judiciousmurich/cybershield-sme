@@ -1,0 +1,235 @@
+{
+  "info": {
+    "name": "CyberShield — PDF report (FR-06)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:4000"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "email",
+      "value": ""
+    },
+    {
+      "key": "assessmentId",
+      "value": ""
+    }
+  ],
+  "item": [
+    {
+      "name": "GET report requires auth",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/assessments/aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee/report"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns 401 without a token', function () {",
+              "  pm.response.to.have.status(401);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Register API user",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"newman.{{$timestamp}}@sme.example\",\n  \"password\": \"SecurePass1\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/register"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('registers the Newman user', function () {",
+              "  pm.response.to.have.status(201);",
+              "  pm.collectionVariables.set('email', pm.response.json().user.email);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/json" }],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"SecurePass1\"\n}"
+        },
+        "url": "{{baseUrl}}/api/auth/login"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('issues a JWT', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.collectionVariables.set('token', pm.response.json().token);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET report 404 for unknown or non-owned assessment",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/assessments/ffffffff-ffff-4fff-8fff-ffffffffffff/report"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns 404 for a non-existent assessment', function () {",
+              "  pm.response.to.have.status(404);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Prepare a completed assessment",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/questions"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const baseUrl = pm.collectionVariables.get('baseUrl') || pm.variables.get('baseUrl');",
+              "const token = pm.collectionVariables.get('token');",
+              "const headers = { Authorization: 'Bearer ' + token, 'Content-Type': 'application/json' };",
+              "",
+              "function firstAnswer(question) {",
+              "  if (question.answer_type === 'scale') {",
+              "    return String((question.options && question.options.min) || 1);",
+              "  }",
+              "  if (question.options && question.options.choices && question.options.choices.length) {",
+              "    return question.options.choices[0];",
+              "  }",
+              "  return 'yes';",
+              "}",
+              "",
+              "pm.test('questions are available for the report fixture', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "",
+              "const domains = pm.response.json().domains || [];",
+              "const questions = [];",
+              "domains.forEach(function (domain) {",
+              "  (domain.questions || []).forEach(function (question) { questions.push(question); });",
+              "});",
+              "",
+              "pm.sendRequest({",
+              "  url: baseUrl + '/api/assessments',",
+              "  method: 'POST',",
+              "  header: headers,",
+              "  body: { mode: 'raw', raw: '{}' }",
+              "}, function (createErr, created) {",
+              "  pm.test('created an assessment', function () {",
+              "    pm.expect(createErr).to.equal(null);",
+              "    pm.expect(created).to.ok;",
+              "  });",
+              "  const assessmentId = created.json().assessment.id;",
+              "  pm.collectionVariables.set('assessmentId', assessmentId);",
+              "",
+              "  function answerAt(index) {",
+              "    if (index >= questions.length) {",
+              "      pm.sendRequest({",
+              "        url: baseUrl + '/api/assessments/' + assessmentId + '/complete',",
+              "        method: 'POST',",
+              "        header: headers,",
+              "        body: { mode: 'raw', raw: '{}' }",
+              "      }, function (completeErr, completed) {",
+              "        pm.test('completed the assessment fixture', function () {",
+              "          pm.expect(completeErr).to.equal(null);",
+              "          pm.expect(completed.code).to.eql(200);",
+              "        });",
+              "      });",
+              "      return;",
+              "    }",
+              "    const question = questions[index];",
+              "    pm.sendRequest({",
+              "      url: baseUrl + '/api/assessments/' + assessmentId + '/responses',",
+              "      method: 'POST',",
+              "      header: headers,",
+              "      body: { mode: 'raw', raw: JSON.stringify({ question_id: question.id, answer_value: firstAnswer(question) }) }",
+              "    }, function () {",
+              "      answerAt(index + 1);",
+              "    });",
+              "  }",
+              "  answerAt(0);",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "GET report returns PDF for a completed assessment",
+      "request": {
+        "method": "GET",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" }
+        ],
+        "url": "{{baseUrl}}/api/assessments/{{assessmentId}}/report"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('returns 200 for a completed assessment', function () {",
+              "  pm.response.to.have.status(200);",
+              "});",
+              "pm.test('Content-Type is application/pdf', function () {",
+              "  pm.expect(pm.response.headers.get('Content-Type')).to.include('application/pdf');",
+              "});",
+              "pm.test('body starts with PDF magic bytes', function () {",
+              "  pm.expect(pm.response.text().slice(0, 4)).to.eql('%PDF');",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

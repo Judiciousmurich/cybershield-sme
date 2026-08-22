@@ -3,6 +3,7 @@ export type PublicUser = {
   email: string;
   role: 'user' | 'admin';
   created_at: string;
+  business_context: string | null;
 };
 
 export type QuestionDomain =

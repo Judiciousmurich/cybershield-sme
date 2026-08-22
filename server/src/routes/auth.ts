@@ -5,7 +5,11 @@ import {
   registerUser,
   toPublicUser,
 } from '../auth/service.js';
-import { DuplicateEmailError, findUserById } from '../db/users.js';
+import {
+  DuplicateEmailError,
+  findUserById,
+  updateBusinessContext,
+} from '../db/users.js';
 import { authRateLimit } from '../middleware/authRateLimit.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import {
@@ -58,6 +62,27 @@ authRouter.post('/login', async (req, res, next) => {
 authRouter.get('/me', requireAuth, async (req, res, next) => {
   try {
     const user = await findUserById(req.user!.id);
+    if (!user) {
+      res.status(401).json({ error: 'Invalid or expired token.' });
+      return;
+    }
+    res.json({ user: toPublicUser(user) });
+  } catch (error) {
+    next(error);
+  }
+});
+
+authRouter.patch('/me', requireAuth, async (req, res, next) => {
+  try {
+    const raw = (req.body as { business_context?: unknown }).business_context;
+    if (raw !== undefined && raw !== null && typeof raw !== 'string') {
+      res.status(400).json({ error: 'business_context must be a string.' });
+      return;
+    }
+
+    const context =
+      typeof raw === 'string' ? raw.trim().slice(0, 500) || null : null;
+    const user = await updateBusinessContext(req.user!.id, context);
     if (!user) {
       res.status(401).json({ error: 'Invalid or expired token.' });
       return;

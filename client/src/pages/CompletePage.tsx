@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { ApiError, api } from '../api';
+import { ApiError, api, downloadPdf } from '../api';
 import { useAuth } from '../auth/AuthContext';
 import type { Assessment, AssessmentResults } from '../types';
 
@@ -9,7 +9,7 @@ type LocationState = {
 };
 
 export function CompletePage() {
-  const { token } = useAuth();
+  const { token, user, updateBusinessContext } = useAuth();
   const location = useLocation();
   const fromState = (location.state as LocationState | null)?.assessment;
   const assessmentId =
@@ -20,6 +20,9 @@ export function CompletePage() {
   );
   const [results, setResults] = useState<AssessmentResults | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [context, setContext] = useState(user?.business_context ?? '');
+  const [savingContext, setSavingContext] = useState(false);
+  const [downloading, setDownloading] = useState(false);
 
   useEffect(() => {
     if (!token || !assessmentId) {
@@ -133,6 +136,79 @@ export function CompletePage() {
                   ))}
                 </ol>
               )}
+            </section>
+
+            <section aria-labelledby="context-heading">
+              <h2 id="context-heading">Business context (optional)</h2>
+              <p className="hint" id="context-help">
+                A short note about the firm (sector, headcount, or key systems)
+                is printed on the PDF report.
+              </p>
+              <div className="field">
+                <label htmlFor="business-context">Business context</label>
+                <textarea
+                  id="business-context"
+                  name="business_context"
+                  rows={3}
+                  maxLength={500}
+                  value={context}
+                  aria-describedby="context-help"
+                  onChange={(event) => setContext(event.target.value)}
+                />
+              </div>
+              <div className="actions">
+                <button
+                  type="button"
+                  className="secondary"
+                  disabled={savingContext}
+                  onClick={() => {
+                    setSavingContext(true);
+                    updateBusinessContext(context)
+                      .catch((err: unknown) => {
+                        setError(
+                          err instanceof ApiError
+                            ? err.message
+                            : 'Could not save business context.',
+                        );
+                      })
+                      .finally(() => setSavingContext(false));
+                  }}
+                >
+                  {savingContext ? 'Saving…' : 'Save context'}
+                </button>
+                <button
+                  type="button"
+                  disabled={downloading || !assessmentId || !token}
+                  onClick={() => {
+                    if (!token || !assessmentId) {
+                      return;
+                    }
+                    setDownloading(true);
+                    downloadPdf(
+                      `/api/assessments/${assessmentId}/report`,
+                      token,
+                    )
+                      .then((blob) => {
+                        const url = URL.createObjectURL(blob);
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = `cybershield-report-${assessmentId}.pdf`;
+                        link.click();
+                        URL.revokeObjectURL(url);
+                      })
+                      .catch((err: unknown) => {
+                        setError(
+                          err instanceof ApiError
+                            ? err.message
+                            : 'Could not download the report.',
+                        );
+                      })
+                      .finally(() => setDownloading(false));
+                  }}
+                >
+                  {downloading ? 'Preparing PDF…' : 'Download Report'}
+                </button>
+              </div>
             </section>
           </>
         )}

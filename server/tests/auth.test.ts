@@ -14,6 +14,7 @@ jest.mock('../src/db/users.js', () => ({
   findUserByEmail: jest.fn(),
   findUserById: jest.fn(),
   createUser: jest.fn(),
+  updateBusinessContext: jest.fn(),
 }));
 
 jest.mock('../src/db/pool.js', () => ({
@@ -33,6 +34,7 @@ function fakeUser(overrides: Partial<UserRecord> = {}): UserRecord {
     password_hash: 'hashed',
     role: 'user',
     created_at: new Date('2026-01-15T10:00:00.000Z'),
+    business_context: null,
     ...overrides,
   };
 }
