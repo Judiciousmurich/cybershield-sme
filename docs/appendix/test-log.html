@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CyberShield test log — 23 August 2026</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; background: #fff; color: #111827; padding: 22px 26px; }
+      h1 { margin: 0 0 4px; font-size: 1.35rem; }
+      .meta { color: #4b5563; margin: 0 0 14px; font-size: 0.92rem; }
+      table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+      th, td { border: 1px solid #d1d5db; padding: 5px 6px; text-align: left; vertical-align: top; }
+      th { background: #eef2ff; }
+      .pass { color: #065f46; font-weight: 700; }
+      .skip { color: #92400e; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <h1>Assessment 2 — Test log</h1>
+    <p class="meta">Product: CyberShield · Run date: 23 August 2026 · Environment: Node.js + Jest 29 (<code>cd server && npm test</code>) · Result: 7 suites, 22 tests, 0 failures.</p>
+    <table>
+      <thead>
+        <tr><th>Test ID</th><th>Req</th><th>Test case</th><th>Expected</th><th>Actual</th><th>Status</th><th>Defect</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>UT-01</td><td>FR-01</td><td>Register; hash never returned</td><td>201; no password_hash</td><td>201; hash compared; hash absent</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-02</td><td>FR-01</td><td>Duplicate email</td><td>409</td><td>409 already registered</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-03</td><td>FR-01</td><td>Valid login</td><td>200; JWT; 1h</td><td>200; token; 1h</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-04</td><td>FR-01</td><td>Wrong password</td><td>401; no token</td><td>401</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-05</td><td>NFR-01</td><td>Unauthenticated /me</td><td>401</td><td>401</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-06–11</td><td>FR-03</td><td>Answer validation + save</td><td>Valid accepted; invalid 400</td><td>Matches</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-12–18</td><td>FR-04</td><td>Weighted scores + bands + recs</td><td>75/Low; 60/Medium; thresholds; weakest domain first</td><td>Matches</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-19</td><td>FR-06</td><td>PDF magic bytes</td><td>%PDF; &gt;200 bytes</td><td>Pass</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-20–21</td><td>NFR-01</td><td>RBAC admin questions</td><td>403 user / 200 admin</td><td>Matches</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>UT-22</td><td>NFR</td><td>AES-256-GCM round-trip</td><td>Decrypt equals plaintext</td><td>Pass</td><td class="pass">Pass</td><td>—</td></tr>
+        <tr><td>API-01–03</td><td>FR-06</td><td>Newman report collection</td><td>401 / 404 / 200 PDF</td><td>Not run this session</td><td class="skip">Not executed</td><td>—</td></tr>
+        <tr><td>SYS-01–03</td><td>FR-03 / WCAG</td><td>Cypress + axe</td><td>Complete + no critical/serious</td><td>Not run this session</td><td class="skip">Not executed</td><td>—</td></tr>
+      </tbody>
+    </table>
+    <p class="meta" style="margin-top:14px">Defects: none from the Jest run. Full row-by-row log: <code>docs/TEST-LOG.md</code>.</p>
+  </body>
+</html>

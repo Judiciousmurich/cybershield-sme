@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CyberShield schema — 23 August 2026</title>
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, sans-serif;
+        background: #f3f6fb;
+        color: #111827;
+        padding: 28px 32px 40px;
+      }
+      h1 { margin: 0 0 6px; font-size: 1.5rem; }
+      .meta { color: #4b5563; margin: 0 0 22px; font-size: 0.95rem; }
+      .tables { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 22px; }
+      .chip {
+        background: #fff;
+        border: 1px solid #d5dbe3;
+        border-radius: 999px;
+        padding: 6px 12px;
+        font-weight: 600;
+        font-size: 0.9rem;
+      }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+      article {
+        background: #fff;
+        border: 1px solid #d5dbe3;
+        border-radius: 12px;
+        padding: 12px 14px;
+      }
+      h2 { margin: 0 0 8px; font-size: 1rem; color: #1e3a8a; }
+      ul { margin: 0; padding-left: 1.1rem; font-size: 0.88rem; line-height: 1.45; }
+      .fk { color: #1e3a8a; }
+    </style>
+  </head>
+  <body>
+    <h1>PostgreSQL 16 — cybershield</h1>
+    <p class="meta">
+      Captured 23 August 2026 from local Postgres
+      (<code>postgresql://localhost:5432/cybershield</code>).
+      Matches Assessment 1 entities: users, assessments, questions, responses, risk_scores, reports.
+    </p>
+    <div class="tables">
+      <span class="chip">users</span>
+      <span class="chip">assessments</span>
+      <span class="chip">questions</span>
+      <span class="chip">responses</span>
+      <span class="chip">risk_scores</span>
+      <span class="chip">reports</span>
+      <span class="chip">schema_migrations</span>
+    </div>
+    <div class="grid">
+      <article>
+        <h2>users</h2>
+        <ul>
+          <li>id uuid PK</li>
+          <li>email unique</li>
+          <li>password_hash</li>
+          <li>role (user | admin)</li>
+          <li>business_context</li>
+          <li>created_at</li>
+        </ul>
+      </article>
+      <article>
+        <h2>assessments</h2>
+        <ul>
+          <li>id uuid PK</li>
+          <li class="fk">user_id → users</li>
+          <li>status (in_progress | completed)</li>
+          <li>started_at / completed_at</li>
+        </ul>
+      </article>
+      <article>
+        <h2>questions</h2>
+        <ul>
+          <li>id uuid PK</li>
+          <li>domain (5 NIST-aligned enums)</li>
+          <li>text, weight, answer_type</li>
+          <li>options jsonb, active</li>
+        </ul>
+      </article>
+      <article>
+        <h2>responses</h2>
+        <ul>
+          <li>id uuid PK</li>
+          <li class="fk">assessment_id → assessments</li>
+          <li class="fk">question_id → questions</li>
+          <li>answer_value, answered_at</li>
+          <li>unique (assessment, question)</li>
+        </ul>
+      </article>
+      <article>
+        <h2>risk_scores</h2>
+        <ul>
+          <li>id uuid PK</li>
+          <li class="fk">assessment_id → assessments</li>
+          <li>domain, score, max_score</li>
+          <li>calculated_at</li>
+        </ul>
+      </article>
+      <article>
+        <h2>reports</h2>
+        <ul>
+          <li>id uuid PK</li>
+          <li class="fk">assessment_id → assessments</li>
+          <li>generated_at</li>
+          <li>file_path_or_blob (AES-wrapped PDF)</li>
+        </ul>
+      </article>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>CyberShield risk register — updated 23 August 2026</title>
+    <style>
+      body { margin: 0; font-family: system-ui, sans-serif; background: #fff; color: #111827; padding: 22px 26px; }
+      h1 { margin: 0 0 4px; font-size: 1.35rem; }
+      .meta { color: #4b5563; margin: 0 0 14px; font-size: 0.92rem; }
+      table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+      th, td { border: 1px solid #d1d5db; padding: 7px 8px; text-align: left; vertical-align: top; }
+      th { background: #eef2ff; }
+      .open { color: #92400e; font-weight: 700; }
+      .mit { color: #065f46; font-weight: 700; }
+    </style>
+  </head>
+  <body>
+    <h1>Risk register — updated 23 August 2026</h1>
+    <p class="meta">Assessment 1 risks reviewed against the implemented Assessment 2 system. Residual items stay open and are also listed in SECURITY.md.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Risk</th>
+          <th>A1 treatment</th>
+          <th>A2 status (23 Aug 2026)</th>
+          <th>Evidence</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>R-01</td>
+          <td>Account takeover / weak password storage</td>
+          <td>Hash passwords; JWT expiry</td>
+          <td class="mit">Mitigated</td>
+          <td>bcryptjs 10 rounds; JWT 1h; UT-01–UT-04</td>
+        </tr>
+        <tr>
+          <td>R-02</td>
+          <td>Unauthorised API access to assessments or reports</td>
+          <td>Auth on all mutating routes</td>
+          <td class="mit">Mitigated</td>
+          <td>requireAuth + ownership 404; UT-05, UT-20</td>
+        </tr>
+        <tr>
+          <td>R-03</td>
+          <td>Stored PDF readable on disk</td>
+          <td>Encrypt reports at rest</td>
+          <td class="mit">Mitigated</td>
+          <td>AES-256-GCM; UT-22; *.pdf.enc</td>
+        </tr>
+        <tr>
+          <td>R-04</td>
+          <td>Schema drift from Assessment 1 model</td>
+          <td>Migrate named entities</td>
+          <td class="mit">Mitigated</td>
+          <td>001_create_schema.sql + 002 business_context; Appendix C6</td>
+        </tr>
+        <tr>
+          <td>R-05</td>
+          <td>Delivery slip / no incremental evidence</td>
+          <td>Phase commits on GitHub</td>
+          <td class="mit">Mitigated</td>
+          <td>https://github.com/Judiciousmurich/cybershield-sme/commits/main</td>
+        </tr>
+        <tr>
+          <td>R-06</td>
+          <td>JWT stolen via XSS (sessionStorage)</td>
+          <td>Prefer HttpOnly cookie</td>
+          <td class="open">Open / residual</td>
+          <td>SECURITY.md known gap</td>
+        </tr>
+        <tr>
+          <td>R-07</td>
+          <td>No TLS on local Docker / open CORS</td>
+          <td>Terminate TLS at edge in production</td>
+          <td class="open">Open / residual</td>
+          <td>Local HTTP only; documented</td>
+        </tr>
+        <tr>
+          <td>R-08</td>
+          <td>System tests not run in the evidence session</td>
+          <td>Newman + Cypress before audit</td>
+          <td class="open">Open</td>
+          <td>API-01–03 and SYS-01–03 Not executed</td>
+        </tr>
+      </tbody>
+    </table>
+  </body>
+</html>
