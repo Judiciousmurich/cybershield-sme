@@ -2,6 +2,7 @@ import cors from 'cors';
 import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
+import path from 'node:path';
 import { pool } from './db/pool.js';
 import { adminQuestionsRouter } from './routes/adminQuestions.js';
 import { assessmentsRouter } from './routes/assessments.js';
@@ -9,13 +10,16 @@ import { authRouter } from './routes/auth.js';
 import { questionsRouter } from './routes/questions.js';
 
 const isTest = process.env.NODE_ENV === 'test';
+const isProduction = process.env.NODE_ENV === 'production';
 
 export function createApp() {
   const app = express();
 
   app.disable('x-powered-by');
   app.use(helmet());
-  app.use(cors());
+  if (!isProduction) {
+    app.use(cors());
+  }
   app.use(express.json({ limit: '32kb' }));
   app.use(
     rateLimit({
@@ -56,6 +60,20 @@ export function createApp() {
   app.use('/api/questions', questionsRouter);
   app.use('/api/assessments', assessmentsRouter);
   app.use('/api/admin/questions', adminQuestionsRouter);
+
+  if (isProduction) {
+    const clientDir = path.resolve(process.cwd(), '../client/dist');
+    app.use(express.static(clientDir));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api')) {
+        next();
+        return;
+      }
+      res.sendFile(path.join(clientDir, 'index.html'), (error) => {
+        if (error) next(error);
+      });
+    });
+  }
 
   app.use(
     (

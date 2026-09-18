@@ -1,4 +1,4 @@
-import { decryptAes256Gcm, encryptAes256Gcm } from '../src/crypto/aes.js';
+import { decryptAes256Gcm, encryptAes256Gcm, getReportEncryptionKey } from '../src/crypto/aes.js';
 
 describe('AES-256-GCM report encryption', () => {
   const key = Buffer.from(
@@ -11,5 +11,10 @@ describe('AES-256-GCM report encryption', () => {
     const encrypted = encryptAes256Gcm(plain, key);
     expect(encrypted.equals(plain)).toBe(false);
     expect(decryptAes256Gcm(encrypted, key).equals(plain)).toBe(true);
+  });
+
+  test('accepts a generated base64 encryption key', () => {
+    process.env.REPORT_ENCRYPTION_KEY = key.toString('base64');
+    expect(getReportEncryptionKey().equals(key)).toBe(true);
   });
 });

@@ -5,13 +5,16 @@ const IV_LENGTH = 12;
 const KEY_LENGTH = 32;
 
 export function getReportEncryptionKey(): Buffer {
-  const hex = process.env.REPORT_ENCRYPTION_KEY;
-  if (!hex || !/^[0-9a-fA-F]{64}$/.test(hex)) {
+  const value = process.env.REPORT_ENCRYPTION_KEY;
+  const key = value && (/^[0-9a-fA-F]{64}$/.test(value)
+    ? Buffer.from(value, 'hex')
+    : Buffer.from(value, 'base64'));
+  if (!key || key.length !== KEY_LENGTH) {
     throw new Error(
-      'REPORT_ENCRYPTION_KEY must be 64 hex characters (32 bytes) for AES-256.',
+      'REPORT_ENCRYPTION_KEY must be 32 bytes encoded as 64 hex characters or base64.',
     );
   }
-  return Buffer.from(hex, 'hex');
+  return key;
 }
 
 export function encryptAes256Gcm(plain: Buffer, key = getReportEncryptionKey()): Buffer {

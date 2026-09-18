@@ -12,7 +12,7 @@ import { countActiveQuestions, findQuestionById } from '../db/questions.js';
 import { findUserById } from '../db/users.js';
 import { requireAuth } from '../middleware/requireAuth.js';
 import { buildReportPdf } from '../reports/pdf.js';
-import { persistReportFile } from '../reports/store.js';
+import { persistReport } from '../reports/store.js';
 import { calculateAndStoreResults } from '../scoring/results.js';
 import { toPublicUser } from '../auth/service.js';
 import { isAssessmentId, validateAnswerValue } from '../validation/answers.js';
@@ -212,7 +212,7 @@ assessmentsRouter.get('/:id/report', async (req, res, next) => {
 
     const results = await calculateAndStoreResults(assessment.id);
     const pdf = await buildReportPdf(toPublicUser(user), results);
-    await persistReportFile(assessment.id, pdf);
+    await persistReport(assessment.id, pdf);
 
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader(

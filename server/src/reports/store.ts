@@ -1,17 +1,12 @@
-import fs from 'node:fs/promises';
-import path from 'node:path';
 import { encryptAes256Gcm } from '../crypto/aes.js';
 import { insertReport } from '../db/reports.js';
 
-export async function persistReportFile(
+export async function persistReport(
   assessmentId: string,
   pdf: Buffer,
 ): Promise<string> {
-  const directory = path.resolve(process.cwd(), 'storage', 'reports');
-  await fs.mkdir(directory, { recursive: true });
-  const fileName = `${assessmentId}-${Date.now()}.pdf.enc`;
-  const filePath = path.join(directory, fileName);
-  await fs.writeFile(filePath, encryptAes256Gcm(pdf));
-  await insertReport(assessmentId, filePath);
-  return filePath;
+  const encrypted = encryptAes256Gcm(pdf);
+  const storedValue = `aes256gcm:${encrypted.toString('base64')}`;
+  await insertReport(assessmentId, storedValue);
+  return storedValue;
 }
